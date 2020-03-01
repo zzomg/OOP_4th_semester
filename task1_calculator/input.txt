@@ -1,0 +1,9 @@
+#it is a commentary
+DEFINE A 5
+DEFINE B 6
+PUSH A
+PUSH B
+*
+PUSH 1
++
+PRINT
