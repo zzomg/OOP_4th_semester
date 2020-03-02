@@ -12,6 +12,7 @@ public class InstrFactory extends AbstractFactory
     public static final Logger LOGGER = Logger.getLogger(InstrFactory.class.getName());
 
     private static volatile InstrFactory instance;
+    private Map<String, Class> classMap = new TreeMap<>();
 
     public static InstrFactory getInstance() {
         InstrFactory localInstance = instance;
@@ -27,7 +28,7 @@ public class InstrFactory extends AbstractFactory
     }
     
      private InstrFactory() {
-
+        //TODO: здесь парсим конфиг и заливаем в мапу команды. в create только создаем экземпляры
 
     }
 
@@ -42,6 +43,7 @@ public class InstrFactory extends AbstractFactory
                 IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.SEVERE, "Unexpected exception");
             e.printStackTrace();
+            //TODO: бросить свои эксепшены
         }
         assert instr instanceof Instruction;
         return (Instruction) instr;
