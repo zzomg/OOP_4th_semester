@@ -14,7 +14,8 @@ public class Calculator
     public List<Double> stack = new ArrayList<>();
 
     public static final String defFilePath = "src/defined.properties";
-
+    
+    //TODO: убрать обращение к файлам
     public static void flushDefFile(String defFileName)
     {
         try {
