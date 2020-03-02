@@ -25,6 +25,11 @@ public class InstrFactory extends AbstractFactory
         }
         return localInstance;
     }
+    
+     private InstrFactory() {
+
+
+    }
 
     @Override
     public Instruction create(String key) {
