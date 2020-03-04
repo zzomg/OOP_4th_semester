@@ -9,9 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,23 +20,24 @@ class DivTest
     {
         List<Double> stack = new ArrayList<>();
         List<String> args = new ArrayList<>();
+        Map<String, Double> vars = new TreeMap<>();
 
         stack.add((double) 5);
         stack.add((double) 10);
 
-        InstrFactory.getInstance().create("oop.java.calc.instruction.Div").execute(stack, args);
+        InstrFactory.getInstance().create("/").execute(stack, args, vars);
 
         Assertions.assertEquals(2, stack.get(0));
 
         args.add("5");
 
         Assertions.assertThrows(CalcException.class,
-                () -> InstrFactory.getInstance().create("oop.java.calc.instruction.Div").execute(stack, args));
+                () -> InstrFactory.getInstance().create("/").execute(stack, args, vars));
 
         stack.clear();
         args.clear();
 
         Assertions.assertThrows(CalcException.class,
-                () -> InstrFactory.getInstance().create("oop.java.calc.instruction.Div").execute(stack, args));
+                () -> InstrFactory.getInstance().create("/").execute(stack, args, vars));
     }
 }
