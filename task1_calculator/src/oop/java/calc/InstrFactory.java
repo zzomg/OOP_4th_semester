@@ -55,9 +55,11 @@ public class InstrFactory extends AbstractFactory
     public Instruction create(String key) {
         Object instr = new Object();
         try {
-            if(classMap.containsKey(key)) {
-                instr = classMap.get(key).getDeclaredConstructor().newInstance();
+            if(!classMap.containsKey(key)) {
+                LOGGER.log(Level.SEVERE, "Unexpected exception: Invalid instruction name");
+                throw new CalcException("Error: Invalid instruction name");
             }
+            instr = classMap.get(key).getDeclaredConstructor().newInstance();
         } catch (InstantiationException | NoSuchMethodException |
                 IllegalAccessException | InvocationTargetException e) {
             LOGGER.log(Level.SEVERE, "Unexpected exception : Couldn't create instruction");
