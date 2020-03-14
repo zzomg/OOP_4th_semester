@@ -7,10 +7,6 @@ import Game.View.TetrisBoard;
 import javax.swing.*;
 import java.awt.*;
 
-/**
- * Created by saacsos on 1/12/2559.
- * http://zetcode.com/tutorials/javagamestutorial/tetris/
- */
 public class BoardController {
     private TetrisBoard tetrisBoard;
     private int boardWidth;
@@ -211,7 +207,9 @@ public class BoardController {
         if (numFullLines > 0) {
             numLinesRemoved += numFullLines;
             tetrisBoard.setStatusText(String.valueOf(numLinesRemoved));
-            TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
+            if(numLinesRemoved > TetrisStartGame.recordTable.get(TetrisStartGame.playerName)) {
+                TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
+            }
             isFallingFinished = true;
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
             tetrisBoard.repaint();
