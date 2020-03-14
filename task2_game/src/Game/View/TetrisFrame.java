@@ -16,13 +16,13 @@ public class TetrisFrame extends JFrame
 
     public void init() {
         setLayout(new BorderLayout());
+        setBackground(Color.BLACK);
         add(statusBar, BorderLayout.SOUTH);
         add(board, BorderLayout.CENTER);
         board.start();
         setSize(300, 400);
         setPreferredSize(new Dimension(300, 400));
         setTitle("Tetris");
-        //pack();
         setVisible(true);
         setResizable(false);
     }

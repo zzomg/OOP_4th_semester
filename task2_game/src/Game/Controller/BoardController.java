@@ -1,6 +1,7 @@
 package Game.Controller;
 
 import Game.Model.Shape;
+import Game.TetrisStartGame;
 import Game.View.TetrisBoard;
 
 import javax.swing.*;
@@ -210,6 +211,7 @@ public class BoardController {
         if (numFullLines > 0) {
             numLinesRemoved += numFullLines;
             tetrisBoard.setStatusText(String.valueOf(numLinesRemoved));
+            TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
             isFallingFinished = true;
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
             tetrisBoard.repaint();

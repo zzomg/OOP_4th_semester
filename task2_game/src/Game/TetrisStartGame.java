@@ -4,6 +4,7 @@ import Game.View.TetrisFrame;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -14,6 +15,7 @@ import java.util.TreeMap;
 public class TetrisStartGame
 {
     public static Map<String, Integer> recordTable = new TreeMap();
+    public static String playerName;
 
     public static void setFrameBackground(JFrame frame, String bgPath)
     {
@@ -86,6 +88,7 @@ public class TetrisStartGame
             submitNameButton.addActionListener(actionEvent1 -> {
                 playerNameSetInfoLabel.setText("Name has been submitted.");
                 String playerName = playerNameField.getText();
+                TetrisStartGame.playerName = playerName;
                 if(!recordTable.containsKey(playerName)) {
                     recordTable.put(playerName, 0);
                 }
@@ -156,6 +159,40 @@ public class TetrisStartGame
             aboutGameFrame.setSize(300,400);
             aboutGameFrame.setVisible(true);
             aboutGameFrame.setResizable(false);
+        });
+
+        recordTableButton.addActionListener(actionEvent -> {
+            JFrame recordTableFrame = new JFrame("Record table");
+            setFrameBackground(recordTableFrame, "src/resources/backgrounds/background-1.jpg");
+
+            JButton goBackButton = new JButton("Go Back");
+            setButtonStyle(goBackButton);
+
+            goBackButton.addActionListener(actionEvent1 -> {
+                recordTableFrame.setVisible(false);
+                recordTableFrame.dispose();
+            });
+
+            for(Map.Entry<String, Integer> player : recordTable.entrySet())
+            {
+                //  TODO: use JPanel probably
+                JLabel playerName = new JLabel(player.getKey());
+                JLabel playerRes = new JLabel(String.valueOf(recordTable.get(player.getKey())));
+                recordTableFrame.add(playerName);
+                recordTableFrame.add(playerRes);
+                playerName.setFont(new Font("Lucida Console", Font.PLAIN, 16));
+                playerName.setForeground(Color.WHITE);
+                playerRes.setFont(new Font("Lucida Console", Font.PLAIN, 16));
+                playerRes.setForeground(Color.WHITE);
+            }
+            recordTableFrame.add(goBackButton);
+
+            recordTableFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+            recordTableFrame.setLocationRelativeTo(null);
+            recordTableFrame.setSize(300,400);
+            recordTableFrame.setLayout(new GridLayout(TetrisStartGame.recordTable.size(), 2));
+            recordTableFrame.setVisible(true);
+            recordTableFrame.setResizable(false);
         });
 
         quitButton.addActionListener(actionEvent -> {
