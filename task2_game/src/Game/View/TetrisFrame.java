@@ -25,7 +25,8 @@ public class TetrisFrame extends JFrame
 
     public void init() {
         setLayout(new BorderLayout());
-        UISettings.setLabelStyle(statusBar);
+        statusBar.setFont(new Font("Lucida Console", Font.PLAIN, 16));
+        statusBar.setForeground(Color.BLACK);
         statusBar.setOpaque(true);
         add(statusBar, BorderLayout.SOUTH);
         add(board, BorderLayout.CENTER);
