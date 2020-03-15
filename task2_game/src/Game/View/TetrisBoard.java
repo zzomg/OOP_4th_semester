@@ -1,37 +1,30 @@
 package Game.View;
 
-import Game.BackgroundPanel;
 import Game.Controller.BoardController;
+import Game.UI.UISettings;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 public class TetrisBoard extends JPanel implements ActionListener
 {
-    private final int BOARD_WIDTH = 10;
-    private final int BOARD_HEIGHT = 12;
-    private JLabel statusBar;
+    private final int BOARD_WIDTH = 15;
+    private final int BOARD_HEIGHT = 16;
 
+    private TetrisFrame tetrisFrame;
+    private JLabel statusBar;
     private BoardController controller;
 
-    TetrisBoard(TetrisFrame parent) throws IOException
-    {
+    TetrisBoard(TetrisFrame parent) {
         setFocusable(true);
         controller = new BoardController(BOARD_WIDTH, BOARD_HEIGHT, this);
         statusBar = parent.getStatusBar();
+        tetrisFrame = parent;
         addKeyListener(new TAdapter());
-
-        BufferedImage background = ImageIO.read(new File("src/resources/backgrounds/background-2.jpg"));
-        BackgroundPanel panel = new BackgroundPanel(background);
-        add(panel);
     }
 
     void start() {
@@ -82,6 +75,33 @@ public class TetrisBoard extends JPanel implements ActionListener
 
     public void setStatusText(String text) {
         statusBar.setText(text);
+    }
+
+    public void checkGameOver() {
+        if(statusBar.getText().equals("game over")) {
+            JButton restartBtn = new JButton("Restart");
+            JButton backToMainMenuBtn = new JButton("Back to main menu");
+
+            UISettings.setButtonStyle(restartBtn);
+            UISettings.setButtonStyle(backToMainMenuBtn);
+
+            restartBtn.addActionListener(actionEvent -> {
+                restartBtn.setVisible(false);
+                backToMainMenuBtn.setVisible(false);
+                tetrisFrame.setVisible(false);
+                tetrisFrame.dispose();
+                tetrisFrame = new TetrisFrame();
+                tetrisFrame.init();
+            });
+
+            backToMainMenuBtn.addActionListener(actionEvent -> {
+                tetrisFrame.setVisible(false);
+                tetrisFrame.dispose();
+            });
+
+            this.add(restartBtn);
+            this.add(backToMainMenuBtn);
+        }
     }
 
     private class TAdapter extends KeyAdapter {

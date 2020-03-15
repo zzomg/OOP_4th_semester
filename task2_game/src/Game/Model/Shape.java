@@ -2,10 +2,6 @@ package Game.Model;
 
 import java.util.Random;
 
-/**
- * Created by saacsos on 1/12/2559.
- * http://zetcode.com/tutorials/javagamestutorial/tetris/
- */
 public class Shape
 {
     public enum Tetrominoes

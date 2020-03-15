@@ -64,7 +64,6 @@ public class BoardController {
         clearBoard();
         newPiece();
         timer.start();
-
     }
 
     public void pause() {
@@ -146,6 +145,9 @@ public class BoardController {
             timer.stop();
             isStarted = false;
             tetrisBoard.setStatusText("game over");
+            tetrisBoard.repaint();
+            clearBoard();
+            tetrisBoard.checkGameOver();
         }
     }
 
@@ -207,8 +209,11 @@ public class BoardController {
         if (numFullLines > 0) {
             numLinesRemoved += numFullLines;
             tetrisBoard.setStatusText(String.valueOf(numLinesRemoved));
-            if(numLinesRemoved > TetrisStartGame.recordTable.get(TetrisStartGame.playerName)) {
-                TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
+            if (TetrisStartGame.playerName != null) {
+                boolean playerExist = TetrisStartGame.recordTable.containsKey(TetrisStartGame.playerName);
+                if (playerExist && numLinesRemoved > TetrisStartGame.recordTable.get(TetrisStartGame.playerName)) {
+                    TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
+                }
             }
             isFallingFinished = true;
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
