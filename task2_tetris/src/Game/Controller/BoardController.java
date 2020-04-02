@@ -6,33 +6,61 @@ import Game.View.TetrisBoard;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BoardController {
-    private TetrisBoard tetrisBoard;
-    private int boardWidth;
-    private int boardHeight;
+    public int boardWidth;
+    public int boardHeight;
     private boolean isFallingFinished = false;
     private boolean isStarted = false;
     private boolean isPaused = false;
 
     private int numLinesRemoved = 0;
-    private int currentX = 0;
-    private int currentY = 0;
+    public int currentX = 0;
+    public int currentY = 0;
     private Timer timer;
 
-    private Shape currentPiece;
+    public Shape currentPiece;
     private Shape.Tetrominoes[] board;
+
+    private List<TetrisBoard> observables = new ArrayList<>();
 
     public BoardController(int boardWidth, int boardHeight, TetrisBoard tetrisBoard) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
-        this.tetrisBoard = tetrisBoard;
         currentPiece = new Shape();
         timer = new Timer(400, tetrisBoard);
         timer.start();
         board = new Shape.Tetrominoes[boardWidth * boardHeight];
 
         clearBoard();
+    }
+
+    public void addObserver(TetrisBoard observable) {
+        this.observables.add(observable);
+    }
+
+    public void removeObserver(TetrisBoard observable) {
+        this.observables.remove(observable);
+    }
+
+    public void updateStatus(String status) {
+        for (TetrisBoard observable : this.observables) {
+            observable.updateStatus(status);
+        }
+    }
+
+    public void updateBoard() {
+        for (TetrisBoard observable : this.observables) {
+            observable.updateBoard();
+        }
+    }
+
+    public void checkGameOver() {
+        for (TetrisBoard observable : this.observables) {
+            observable.checkGameOver();
+        }
     }
 
     public void gameAction() {
@@ -57,7 +85,8 @@ public class BoardController {
     }
 
     public void start() {
-        if (isPaused) return;
+        if (isPaused)
+            return;
         isStarted = true;
         isFallingFinished = false;
         numLinesRemoved = 0;
@@ -73,12 +102,12 @@ public class BoardController {
         isPaused = !isPaused;
         if (isPaused) {
             timer.stop();
-            tetrisBoard.setStatusText("paused");
+            updateStatus("paused");
         } else {
             timer.start();
-            tetrisBoard.setStatusText(String.valueOf(numLinesRemoved));
+            updateStatus(String.valueOf(numLinesRemoved));
         }
-        tetrisBoard.repaint();
+        updateBoard();
     }
 
     public void oneLineDown()
@@ -104,34 +133,8 @@ public class BoardController {
         pieceDropped();
     }
 
-    private Shape.Tetrominoes shapeAt(int x, int y) {
+    public Shape.Tetrominoes shapeAt(int x, int y) {
         return board[(y * boardWidth) + x];
-    }
-
-    public void paint(Graphics g, double width, double height) {
-        int squareWidth = (int) width / boardWidth;
-        int squareHeight = (int) height / boardHeight;
-        int boardTop = (int) height - boardHeight * squareHeight;
-
-
-        for (int i = 0; i < boardHeight; ++i) {
-            for (int j = 0; j < boardWidth; ++j) {
-                Game.Model.Shape.Tetrominoes shape = shapeAt(j, boardHeight - i - 1);
-                if (shape != Game.Model.Shape.Tetrominoes.NoShape)
-                    tetrisBoard.drawSquare(g, j * squareWidth,
-                            boardTop + i * squareHeight, shape);
-            }
-        }
-
-        if (currentPiece.getPieceShape() != Game.Model.Shape.Tetrominoes.NoShape) {
-            for (int i = 0; i < 4; ++i) {
-                int x = currentX + currentPiece.x(i);
-                int y = currentY - currentPiece.y(i);
-                tetrisBoard.drawSquare(g, x * squareWidth,
-                        boardTop + (boardHeight - y - 1) * squareHeight,
-                        currentPiece.getPieceShape());
-            }
-        }
     }
 
     private void newPiece()
@@ -144,10 +147,10 @@ public class BoardController {
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
             timer.stop();
             isStarted = false;
-            tetrisBoard.setStatusText("game over");
-            tetrisBoard.repaint();
+            updateStatus("game over");
+            updateBoard();
             clearBoard();
-            tetrisBoard.checkGameOver();
+            checkGameOver();
         }
     }
 
@@ -165,7 +168,7 @@ public class BoardController {
         currentPiece = newPiece;
         currentX = newX;
         currentY = newY;
-        tetrisBoard.repaint();
+        updateBoard();
         return true;
     }
 
@@ -208,7 +211,7 @@ public class BoardController {
 
         if (numFullLines > 0) {
             numLinesRemoved += numFullLines;
-            tetrisBoard.setStatusText(String.valueOf(numLinesRemoved));
+            updateStatus(String.valueOf(numLinesRemoved));
             if (TetrisStartGame.playerName != null) {
                 boolean playerExist = TetrisStartGame.recordTable.containsKey(TetrisStartGame.playerName);
                 if (playerExist && numLinesRemoved > TetrisStartGame.recordTable.get(TetrisStartGame.playerName)) {
@@ -217,7 +220,7 @@ public class BoardController {
             }
             isFallingFinished = true;
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
-            tetrisBoard.repaint();
+            updateBoard();
         }
     }
 

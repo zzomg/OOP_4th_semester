@@ -28,6 +28,7 @@ public class TetrisBoard extends JPanel implements ActionListener
     }
 
     void start() {
+        controller.addObserver(this);
         controller.start();
     }
 
@@ -38,7 +39,7 @@ public class TetrisBoard extends JPanel implements ActionListener
 
     public void paint(Graphics g) {
         super.paint(g);
-        controller.paint(g, getSize().getWidth(), getSize().getHeight());
+        paint(g, getSize().getWidth(), getSize().getHeight());
     }
 
     private int squareWidth() { return (int) getSize().getWidth() / BOARD_WIDTH; }
@@ -91,6 +92,7 @@ public class TetrisBoard extends JPanel implements ActionListener
                 tetrisFrame.setVisible(false);
                 tetrisFrame.dispose();
                 tetrisFrame = new TetrisFrame();
+                controller.removeObserver(this);
                 tetrisFrame.init();
             });
 
@@ -144,7 +146,41 @@ public class TetrisBoard extends JPanel implements ActionListener
                     controller.oneLineDown();
                     break;
             }
+        }
+    }
 
+    public void updateStatus(String status) {
+        setStatusText(status);
+    }
+
+    public void updateBoard() {
+        repaint();
+    }
+
+    public void paint(Graphics g, double width, double height)
+    {
+        int squareWidth = (int) width / controller.boardWidth;
+        int squareHeight = (int) height / controller.boardHeight;
+        int boardTop = (int) height - controller.boardHeight * squareHeight;
+
+        for (int i = 0; i < controller.boardHeight; ++i) {
+            for (int j = 0; j < controller.boardWidth; ++j) {
+                Game.Model.Shape.Tetrominoes shape = controller.shapeAt(j, controller.boardHeight - i - 1);
+                if (shape != Game.Model.Shape.Tetrominoes.NoShape)
+                    drawSquare(g, j * squareWidth,
+                            boardTop + i * squareHeight, shape);
+            }
+        }
+
+        if (controller.currentPiece.getPieceShape() != Game.Model.Shape.Tetrominoes.NoShape) {
+            for (int i = 0; i < 4; ++i) {
+                int x = controller.currentX + controller.currentPiece.x(i);
+                int y = controller.currentY - controller.currentPiece.y(i);
+                drawSquare(g, x * squareWidth,
+                        boardTop + (controller.boardHeight - y - 1) * squareHeight,
+                        controller.currentPiece.getPieceShape());
+            }
         }
     }
 }
+
