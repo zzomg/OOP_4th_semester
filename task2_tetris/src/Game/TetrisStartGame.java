@@ -22,6 +22,9 @@ public class TetrisStartGame
                 .forEachOrdered(x -> tableSorted.put(x.getKey(), x.getValue()));
     }
 
+    // TODO: все сделать так, чтобы в одном фрейме было (не много фреймов, а много панелек)
+    // все панельки в один фрейм добавлять
+    // либо через cardlayout (сразу все панельки добавляем, потом между ними переключаемся)
     public static void main(String[] args)
     {
         JFrame mainMenuFrame = new JFrame("Tetris - The Game");

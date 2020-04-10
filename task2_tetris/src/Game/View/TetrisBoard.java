@@ -5,12 +5,10 @@ import Game.UI.UISettings;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-public class TetrisBoard extends JPanel implements ActionListener
+public class TetrisBoard extends JPanel implements Observable
 {
     private final int BOARD_WIDTH = 15;
     private final int BOARD_HEIGHT = 16;
@@ -21,7 +19,7 @@ public class TetrisBoard extends JPanel implements ActionListener
 
     TetrisBoard(TetrisFrame parent) {
         setFocusable(true);
-        controller = new BoardController(BOARD_WIDTH, BOARD_HEIGHT, this);
+        controller = new BoardController(BOARD_WIDTH, BOARD_HEIGHT);
         statusBar = parent.getStatusBar();
         tetrisFrame = parent;
         addKeyListener(new TAdapter());
@@ -30,11 +28,6 @@ public class TetrisBoard extends JPanel implements ActionListener
     void start() {
         controller.addObserver(this);
         controller.start();
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        controller.gameAction();
     }
 
     public void paint(Graphics g) {
@@ -78,6 +71,7 @@ public class TetrisBoard extends JPanel implements ActionListener
         statusBar.setText(text);
     }
 
+    @Override
     public void checkGameOver() {
         if(statusBar.getText().equals("game over")) {
             JButton restartBtn = new JButton("Restart");
@@ -106,7 +100,18 @@ public class TetrisBoard extends JPanel implements ActionListener
         }
     }
 
+    @Override
+    public void updateBoard() {
+        repaint();
+    }
+
+    @Override
+    public void updateStatus(String status) {
+        setStatusText(status);
+    }
+
     private class TAdapter extends KeyAdapter {
+
         public void keyPressed(KeyEvent e) {
 
             if (!controller.isStarted() || controller.isCurrentPieceNoShaped()) {
@@ -147,14 +152,7 @@ public class TetrisBoard extends JPanel implements ActionListener
                     break;
             }
         }
-    }
 
-    public void updateStatus(String status) {
-        setStatusText(status);
-    }
-
-    public void updateBoard() {
-        repaint();
     }
 
     public void paint(Graphics g, double width, double height)

@@ -2,12 +2,12 @@ package Game.Controller;
 
 import Game.Model.Shape;
 import Game.TetrisStartGame;
-import Game.View.TetrisBoard;
+import Game.View.Observable;
 
-import javax.swing.*;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class BoardController {
     public int boardWidth;
@@ -24,51 +24,71 @@ public class BoardController {
     public Shape currentPiece;
     private Shape.Tetrominoes[] board;
 
-    private List<TetrisBoard> observables = new ArrayList<>();
+    private List<Observable> observables = new ArrayList<>();
 
-    public BoardController(int boardWidth, int boardHeight, TetrisBoard tetrisBoard) {
+    public BoardController(int boardWidth, int boardHeight) {
         this.boardWidth = boardWidth;
         this.boardHeight = boardHeight;
         currentPiece = new Shape();
-        timer = new Timer(400, tetrisBoard);
-        timer.start();
+        this.timer = new Timer();
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (isFallingFinished) {
+                    isFallingFinished = false;
+                    newPiece();
+                } else {
+                    oneLineDown();
+                }
+            }
+        }, 0, 400);
         board = new Shape.Tetrominoes[boardWidth * boardHeight];
 
         clearBoard();
     }
 
-    public void addObserver(TetrisBoard observable) {
-        this.observables.add(observable);
+    public void pauseTimer() {
+        this.timer.cancel();
     }
 
-    public void removeObserver(TetrisBoard observable) {
-        this.observables.remove(observable);
+    public void resumeTimer() {
+        this.timer = new Timer();
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (isFallingFinished) {
+                    isFallingFinished = false;
+                    newPiece();
+                } else {
+                    oneLineDown();
+                }
+            }
+        }, 0, 400);
+    }
+
+    public void addObserver(Observable obs) {
+        this.observables.add(obs);
+    }
+
+    public void removeObserver(Observable obs) {
+        this.observables.remove(obs);
     }
 
     public void updateStatus(String status) {
-        for (TetrisBoard observable : this.observables) {
-            observable.updateStatus(status);
+        for (Observable obs : this.observables) {
+            obs.updateStatus(status);
         }
     }
 
     public void updateBoard() {
-        for (TetrisBoard observable : this.observables) {
-            observable.updateBoard();
+        for (Observable obs : this.observables) {
+            obs.updateBoard();
         }
     }
 
     public void checkGameOver() {
-        for (TetrisBoard observable : this.observables) {
-            observable.checkGameOver();
-        }
-    }
-
-    public void gameAction() {
-        if (isFallingFinished) {
-            isFallingFinished = false;
-            newPiece();
-        } else {
-            oneLineDown();
+        for (Observable obs : this.observables) {
+            obs.checkGameOver();
         }
     }
 
@@ -92,7 +112,7 @@ public class BoardController {
         numLinesRemoved = 0;
         clearBoard();
         newPiece();
-        timer.start();
+//        timer.start();
     }
 
     public void pause() {
@@ -101,10 +121,12 @@ public class BoardController {
 
         isPaused = !isPaused;
         if (isPaused) {
-            timer.stop();
+//            timer.stop();
+            pauseTimer();
             updateStatus("paused");
         } else {
-            timer.start();
+//            timer.start();
+            resumeTimer();
             updateStatus(String.valueOf(numLinesRemoved));
         }
         updateBoard();
@@ -145,7 +167,8 @@ public class BoardController {
 
         if (!tryMove(currentPiece, currentX, currentY)) {
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
-            timer.stop();
+//            timer.stop();
+            pauseTimer();
             isStarted = false;
             updateStatus("game over");
             updateBoard();
