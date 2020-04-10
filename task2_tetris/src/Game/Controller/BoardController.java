@@ -112,7 +112,6 @@ public class BoardController {
         numLinesRemoved = 0;
         clearBoard();
         newPiece();
-//        timer.start();
     }
 
     public void pause() {
@@ -121,11 +120,9 @@ public class BoardController {
 
         isPaused = !isPaused;
         if (isPaused) {
-//            timer.stop();
             pauseTimer();
             updateStatus("paused");
         } else {
-//            timer.start();
             resumeTimer();
             updateStatus(String.valueOf(numLinesRemoved));
         }
@@ -167,7 +164,6 @@ public class BoardController {
 
         if (!tryMove(currentPiece, currentX, currentY)) {
             currentPiece.setPieceShape(Shape.Tetrominoes.NoShape);
-//            timer.stop();
             pauseTimer();
             isStarted = false;
             updateStatus("game over");
