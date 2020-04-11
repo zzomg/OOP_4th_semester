@@ -110,7 +110,7 @@ public class UserInterface extends JFrame
         recordTablePanel.add(Box.createRigidArea(new Dimension(0, 30)));
     }
 
-    public void uploadRecordTable()
+    public void updateRecordTable()
     {
         JPanel newRecordTablePanel = new JPanel() {
             @Override
@@ -247,7 +247,7 @@ public class UserInterface extends JFrame
         setPanel_records(recordTablePanel);
         recordTableButton.addActionListener(actionEvent ->
         {
-            uploadRecordTable();
+            updateRecordTable();
             cardLayout.show(content, "records");
         });
 
