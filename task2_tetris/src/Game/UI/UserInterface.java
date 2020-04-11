@@ -75,15 +75,18 @@ public class UserInterface extends JFrame
         UISettings.setLabelStyle(recordTableLabel);
         recordTableLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        JButton goBackButton_records = new JButton("Go Back");
+        UISettings.setButtonStyle(goBackButton_records);
+        goBackButton_records.setAlignmentX(Component.CENTER_ALIGNMENT);
+        goBackButton_records.setAlignmentY(Component.BOTTOM_ALIGNMENT);
+        goBackButton_records.addActionListener(actionEvent1 -> cardLayout.show(content, "main_menu"));
+
         recordTablePanel.setLayout(new BoxLayout(recordTablePanel, BoxLayout.Y_AXIS));
 
         recordTablePanel.add(Box.createRigidArea(new Dimension(0, 30)));
         recordTablePanel.add(recordTableLabel);
         recordTablePanel.add(Box.createVerticalGlue());
-    }
 
-    public void showRecordTable(JPanel recordTablePanel)
-    {
         int playersShown = 0;
         LinkedHashMap<String, Integer> recordTableSorted = new LinkedHashMap<>();
         sortRecordTable(recordTable, recordTableSorted);
@@ -101,6 +104,23 @@ public class UserInterface extends JFrame
             recordTablePanel.add(playerRes);
             ++playersShown;
         }
+
+        recordTablePanel.add(Box.createVerticalGlue());
+        recordTablePanel.add(goBackButton_records);
+        recordTablePanel.add(Box.createRigidArea(new Dimension(0, 30)));
+    }
+
+    public void uploadRecordTable()
+    {
+        JPanel newRecordTablePanel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(bg2, 0, 0, null);
+            }
+        };
+        setPanel_records(newRecordTablePanel);
+        content.add("records", newRecordTablePanel);
     }
 
     public void setPanel_play(JPanel playerNamePanel, TetrisBoard boardPanel)
@@ -227,16 +247,7 @@ public class UserInterface extends JFrame
         setPanel_records(recordTablePanel);
         recordTableButton.addActionListener(actionEvent ->
         {
-            JButton goBackButton_records = new JButton("Go Back");
-            UISettings.setButtonStyle(goBackButton_records);
-            goBackButton_records.setAlignmentX(Component.CENTER_ALIGNMENT);
-            goBackButton_records.addActionListener(actionEvent1 -> cardLayout.show(content, "main_menu"));
-
-            showRecordTable(recordTablePanel);
-
-            recordTablePanel.add(Box.createVerticalGlue());
-            recordTablePanel.add(goBackButton_records);
-            recordTablePanel.add(Box.createRigidArea(new Dimension(0, 30)));
+            uploadRecordTable();
             cardLayout.show(content, "records");
         });
 
@@ -253,7 +264,6 @@ public class UserInterface extends JFrame
         content.add("main_menu", mainMenuPanel);
         content.add("play", playerNamePanel);
         content.add("about", aboutGamePanel);
-        content.add("records", recordTablePanel);
         content.add("tetris", boardPanel);
     }
 }
