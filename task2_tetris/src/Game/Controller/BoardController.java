@@ -1,7 +1,7 @@
 package Game.Controller;
 
 import Game.Model.Shape;
-import Game.TetrisStartGame;
+import Game.UI.UserInterface;
 import Game.View.Observable;
 
 import java.util.ArrayList;
@@ -231,10 +231,10 @@ public class BoardController {
         if (numFullLines > 0) {
             numLinesRemoved += numFullLines;
             updateStatus(String.valueOf(numLinesRemoved));
-            if (TetrisStartGame.playerName != null) {
-                boolean playerExist = TetrisStartGame.recordTable.containsKey(TetrisStartGame.playerName);
-                if (playerExist && numLinesRemoved > TetrisStartGame.recordTable.get(TetrisStartGame.playerName)) {
-                    TetrisStartGame.recordTable.put(TetrisStartGame.playerName, numLinesRemoved);
+            if (UserInterface.playerName != null) {
+                boolean playerExist = UserInterface.recordTable.containsKey(UserInterface.playerName);
+                if (playerExist && numLinesRemoved > UserInterface.recordTable.get(UserInterface.playerName)) {
+                    UserInterface.recordTable.put(UserInterface.playerName, numLinesRemoved);
                 }
             }
             isFallingFinished = true;

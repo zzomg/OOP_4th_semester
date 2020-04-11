@@ -2,6 +2,7 @@ package Game.View;
 
 import Game.Controller.BoardController;
 import Game.UI.UISettings;
+import Game.UI.UserInterface;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,21 +12,26 @@ import java.awt.event.KeyEvent;
 public class TetrisBoard extends JPanel implements Observable
 {
     private final int BOARD_WIDTH = 15;
-    private final int BOARD_HEIGHT = 16;
+    private final int BOARD_HEIGHT = 17;
 
-    private TetrisFrame tetrisFrame;
     private JLabel statusBar;
     private BoardController controller;
 
-    TetrisBoard(TetrisFrame parent) {
-        setFocusable(true);
+    public TetrisBoard() {
+        setLayout(null);
         controller = new BoardController(BOARD_WIDTH, BOARD_HEIGHT);
-        statusBar = parent.getStatusBar();
-        tetrisFrame = parent;
+        statusBar = new JLabel("0");
+        statusBar.setFont(new Font("Lucida Console", Font.PLAIN, 20));
+        statusBar.setForeground(Color.WHITE);
+        statusBar.setBounds(7, 5, 150, 30);
+        statusBar.setHorizontalAlignment(SwingConstants.LEFT);
         addKeyListener(new TAdapter());
+        add(statusBar);
     }
 
-    void start() {
+    public void start() {
+        setFocusable(true);
+        requestFocusInWindow();
         controller.addObserver(this);
         controller.start();
     }
@@ -73,9 +79,13 @@ public class TetrisBoard extends JPanel implements Observable
 
     @Override
     public void checkGameOver() {
+        statusBar.setBounds(90, 100, 150, 30);
         if(statusBar.getText().equals("game over")) {
             JButton restartBtn = new JButton("Restart");
             JButton backToMainMenuBtn = new JButton("Back to main menu");
+
+            restartBtn.setBounds(70, 150, 150, 30);
+            backToMainMenuBtn.setBounds(20, 180, 250, 30);
 
             UISettings.setButtonStyle(restartBtn);
             UISettings.setButtonStyle(backToMainMenuBtn);
@@ -83,16 +93,15 @@ public class TetrisBoard extends JPanel implements Observable
             restartBtn.addActionListener(actionEvent -> {
                 restartBtn.setVisible(false);
                 backToMainMenuBtn.setVisible(false);
-                tetrisFrame.setVisible(false);
-                tetrisFrame.dispose();
-                tetrisFrame = new TetrisFrame();
                 controller.removeObserver(this);
-                tetrisFrame.init();
+                UserInterface.reloadBoard();
             });
 
             backToMainMenuBtn.addActionListener(actionEvent -> {
-                tetrisFrame.setVisible(false);
-                tetrisFrame.dispose();
+                restartBtn.setVisible(false);
+                backToMainMenuBtn.setVisible(false);
+                controller.removeObserver(this);
+                UserInterface.returnToMainMenu();
             });
 
             this.add(restartBtn);
@@ -125,8 +134,9 @@ public class TetrisBoard extends JPanel implements Observable
                 return;
             }
 
-            if (controller.isPaused())
+            if (controller.isPaused()) {
                 return;
+            }
 
             switch (keycode) {
                 case KeyEvent.VK_LEFT:
