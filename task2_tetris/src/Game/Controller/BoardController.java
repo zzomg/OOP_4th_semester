@@ -31,17 +31,6 @@ public class BoardController {
         this.boardHeight = boardHeight;
         currentPiece = new Shape();
         this.timer = new Timer();
-        this.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                if (isFallingFinished) {
-                    isFallingFinished = false;
-                    newPiece();
-                } else {
-                    oneLineDown();
-                }
-            }
-        }, 0, 400);
         board = new Shape.Tetrominoes[boardWidth * boardHeight];
 
         clearBoard();
@@ -110,6 +99,17 @@ public class BoardController {
         isStarted = true;
         isFallingFinished = false;
         numLinesRemoved = 0;
+        this.timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                if (isFallingFinished) {
+                    isFallingFinished = false;
+                    newPiece();
+                } else {
+                    oneLineDown();
+                }
+            }
+        }, 0, 400);
         clearBoard();
         newPiece();
     }
