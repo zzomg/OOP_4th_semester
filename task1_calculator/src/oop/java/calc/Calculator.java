@@ -13,7 +13,8 @@ public class Calculator
 
     public List<Double> stack = new ArrayList<>();
     public Map<String, Double> vars = new TreeMap<>();
-
+    
+    // TODO: string -> inputStream
     public double calculate(String inputSourceName) throws FileNotFoundException
     {
         LOGGER.setLevel(Level.FINER);
