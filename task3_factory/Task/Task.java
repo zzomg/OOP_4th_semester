@@ -6,11 +6,6 @@ import Details.CarcassDetail;
 import Details.EngineDetail;
 import Storage.Storage;
 
-// TODO: ЭТО ТАСК (а не воркер)
-// TODO: Контроллер подписан на события склада готовых изделий, он смотрит не осталось ли там мало машин
-// если осталось мало (<20%), он генерит таски для тредпула (генерить = executor.submit(task))
-// TODO: рандомная задержка запросов у дилеров
-
 public class Task implements Runnable
 {
     private Storage<EngineDetail> engineStorage;
