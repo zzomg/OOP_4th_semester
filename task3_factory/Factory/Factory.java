@@ -8,6 +8,7 @@ import Details.EngineDetail;
 import Storage.Storage;
 import Storage.StorageController;
 import Supplier.Supplier;
+import Task.Task;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,6 @@ public class Factory
     private int n_dealers;
 
     private ThreadPoolExecutor workers;
-    private StorageController controller;
 
     public Storage<EngineDetail> engineDetailStorage;
     public Storage<CarcassDetail> carcassDetailStorage;
@@ -73,14 +73,13 @@ public class Factory
         }
 
         this.workers = (ThreadPoolExecutor) Executors.newFixedThreadPool(n_workers);
-        this.controller = new StorageController(this.workers, this.engineDetailStorage, this.carcassDetailStorage,
-                this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);
     }
 
     public void start()
     {
-        this.controller.addObserver(this.carStorage);
-        this.controller.start();
+        StorageController controller = new StorageController(this.workers, this.engineDetailStorage, this.carcassDetailStorage,
+                this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);
+        this.carStorage.addObserver(controller);
 
         engineDetailSupplier.start();
         carcassDetailSupplier.start();
@@ -91,5 +90,9 @@ public class Factory
         for(int i = 0; i < n_dealers; ++i) {
             this.dealers.get(i).start();
         }
+
+        Task task = new Task(this.engineDetailStorage, this.carcassDetailStorage,
+                this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);
+        this.workers.execute(task);
     }
 }

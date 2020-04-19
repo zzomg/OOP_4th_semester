@@ -1,11 +1,31 @@
 package Storage;
 
-import java.util.LinkedList;
+import javafx.beans.binding.ObjectBinding;
 
-public class Storage<T> implements Observable
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class Storage<T>
 {
     private long capacity;
     private LinkedList<T> storage = new LinkedList<>();
+
+    private List<Observer> observers = new ArrayList<>();
+
+    public void addObserver(Observer o) {
+        this.observers.add(o);
+    }
+
+    public void removeObserver(Observer o) {
+        this.observers.remove(o);
+    }
+
+    public void updateObservers() {
+        for(Observer o : observers) {
+            o.update(this.storage.size(), this.capacity);
+        }
+    }
 
     public Storage(long capacity) {
         this.capacity = capacity;
@@ -16,6 +36,7 @@ public class Storage<T> implements Observable
             if(storage.size() < capacity) {
                 storage.add(item);
 //                System.out.println(String.format("Item added to storage. Storage size: %d", storage.size()));
+//                updateObservers();
                 this.notify();
                 return;
             }
@@ -28,20 +49,11 @@ public class Storage<T> implements Observable
             if(storage.size() > 0) {
                 T item = storage.pop();
 //                System.out.println(String.format("Got an item from storage. Storage size: %d", storage.size()));
+                updateObservers();
                 this.notify();
                 return item;
             }
             this.wait();
         }
-    }
-
-    @Override
-    public long getSize() {
-        return storage.size();
-    }
-
-    @Override
-    public long getCapacity() {
-        return capacity;
     }
 }

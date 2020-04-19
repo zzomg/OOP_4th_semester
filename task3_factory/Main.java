@@ -1,23 +1,50 @@
 import Factory.Factory;
 
-public class Main {
-    public static void main(String[] args) {
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+public class Main
+{
+    private static void getFactoryInitValues(Map<String, Integer> initValues)
+    {
+        InputStream input = Main.class.getClassLoader().getResourceAsStream("config.properties");
+
+        try {
+            if( input == null ) {
+                throw new Exception("Error : config file not found");
+            }
+            Properties properties = new Properties();
+            properties.load(input);
+            for (Object prop : properties.keySet()) {
+                initValues.put(prop.toString(), Integer.parseInt(properties.getProperty(prop.toString())));
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args)
+    {
+        Map<String, Integer> initValues = new HashMap<>();
+        getFactoryInitValues(initValues);
+
         Factory factory = new Factory();
-        factory.initialize(10, 10, 30, 10,
-                1000, 1500, 500, 5000,
-                3, 6, 3);
-        /*engineStorageCapacity = 10
-        * carcassStorageCapacity = 10
-        * accessoriesStorageCapacity = 30
-        * carStorageCapacity = 10
-        * engineSupCooldown = 1000
-        * carcassSupCooldown = 1500
-        * accessoriesSupCooldown = 500
-        * dealerCooldown = 5000
-        * n_accessoriesSuppliers = 3
-        * n_workers = 6
-        * n_dealers = 3
-        * */
+        factory.initialize(
+                initValues.get("engineStorageCapacity"),
+                initValues.get("carcassStorageCapacity"),
+                initValues.get("accessoriesStorageCapacity"),
+                initValues.get("carStorageCapacity"),
+                initValues.get("engineSupCooldown"),
+                initValues.get("carcassSupCooldown"),
+                initValues.get("accessoriesSupCooldown"),
+                initValues.get("dealerCooldown"),
+                initValues.get("n_accessoriesSuppliers"),
+                initValues.get("n_workers"),
+                initValues.get("n_dealers")
+        );
         factory.start();
     }
 }

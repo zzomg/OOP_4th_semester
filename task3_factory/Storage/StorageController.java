@@ -9,9 +9,8 @@ import Task.Task;
 import java.util.concurrent.ThreadPoolExecutor;
 
 // observer
-public class StorageController extends Thread
+public class StorageController implements Observer
 {
-    private Observable observable;
     private ThreadPoolExecutor executor;
     private Storage<EngineDetail> engineStorage;
     private Storage<CarcassDetail> carcassStorage;
@@ -26,7 +25,7 @@ public class StorageController extends Thread
             Storage<AccessoriesDetail> accessoriesStorage,
             int n_accessories,
             Storage<Car> carStorage
-            )
+        )
     {
         this.executor = executor;
         this.engineStorage = engineStorage;
@@ -36,34 +35,19 @@ public class StorageController extends Thread
         this.carStorage = carStorage;
     }
 
-    public void addObserver(Observable o) {
-        this.observable = o;
-    }
-
     @Override
-    public void run() {
-        while (!isInterrupted()) {
-            try {
-                System.out.println("Checking car storage...");
+    public void update(long size, long capacity) {
+        System.out.println("Checking car storage...");
+        System.out.println(String.format("Car storage size: %d", size));
 
-                long size = observable.getSize();
-                System.out.println(String.format("Car storage size: %d", size));
-                long capacity = observable.getCapacity();
-
-                // try and fill storage up to 80% of capacity
-                if(size < (long)(capacity * 0.2)) {
-                    for(int i = 0; i < (long)(capacity * 0.8) - size; ++i) {
-                        Task task = new Task(engineStorage, carcassStorage, accessoriesStorage, n_accessories, carStorage);
-                        executor.execute(task);
-                    }
-                    System.out.println(String.format("Controller : Added %d tasks to workflow.",
-                            (long)(capacity * 0.8) - size));
-                }
-                sleep(3000);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-                break;
+        // try and fill storage up to 80% of capacity
+        if(size < (long)(capacity * 0.2)) {
+            for(int i = 0; i < (long)(capacity * 0.8) - size; ++i) {
+                Task task = new Task(engineStorage, carcassStorage, accessoriesStorage, n_accessories, carStorage);
+                executor.execute(task);
             }
+            System.out.println(String.format("Controller : Added %d tasks to workflow.",
+                    (long)(capacity * 0.8) - size));
         }
     }
 }
