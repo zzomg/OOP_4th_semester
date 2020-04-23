@@ -9,15 +9,15 @@ import Storage.Storage;
 import Storage.StorageController;
 import Supplier.Supplier;
 import Task.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
+import Exception.FactoryException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Factory
 {
@@ -64,30 +64,38 @@ public class Factory
     {
         getFactoryInitValues(initValues);
 
-        this.engineDetailStorage = new Storage<EngineDetail>(initValues.get("engineStorageCapacity"));
-        this.carcassDetailStorage = new Storage<CarcassDetail>(initValues.get("carcassStorageCapacity"));
-        this.accessoriesDetailStorage = new Storage<AccessoriesDetail>(initValues.get("accessoriesStorageCapacity"));
-        this.carStorage = new Storage<Car>(initValues.get("carStorageCapacity"));
+        try {
+            this.engineDetailStorage = new Storage<EngineDetail>(initValues.get("engineStorageCapacity"));
+            this.carcassDetailStorage = new Storage<CarcassDetail>(initValues.get("carcassStorageCapacity"));
+            this.accessoriesDetailStorage = new Storage<AccessoriesDetail>(initValues.get("accessoriesStorageCapacity"));
+            this.carStorage = new Storage<Car>(initValues.get("carStorageCapacity"));
 
-        this.n_accessoriesSuppliers = initValues.get("n_accessoriesSuppliers");
-        this.n_dealers = initValues.get("n_dealers");
+            this.n_accessoriesSuppliers = initValues.get("n_accessoriesSuppliers");
+            this.n_dealers = initValues.get("n_dealers");
 
-        this.engineDetailSupplier = new Supplier<EngineDetail>(engineDetailStorage,
-                EngineDetail.class, initValues.get("engineSupCooldown"));
-        this.carcassDetailSupplier = new Supplier<CarcassDetail>(carcassDetailStorage,
-                CarcassDetail.class, initValues.get("carcassSupCooldown"));
+            this.engineDetailSupplier = new Supplier<EngineDetail>(engineDetailStorage,
+                    EngineDetail.class, initValues.get("engineSupCooldown"));
+            this.carcassDetailSupplier = new Supplier<CarcassDetail>(carcassDetailStorage,
+                    CarcassDetail.class, initValues.get("carcassSupCooldown"));
 
-        this.accessoriesDetailSuppliers = new ArrayList<>();
-        for (int i = 0; i < n_accessoriesSuppliers; ++i) {
-            this.accessoriesDetailSuppliers.add(new Supplier<AccessoriesDetail>(accessoriesDetailStorage,
-                    AccessoriesDetail.class, initValues.get("accessoriesSupCooldown")));
+            this.accessoriesDetailSuppliers = new ArrayList<>();
+            for (int i = 0; i < n_accessoriesSuppliers; ++i) {
+                this.accessoriesDetailSuppliers.add(new Supplier<AccessoriesDetail>(accessoriesDetailStorage,
+                        AccessoriesDetail.class, initValues.get("accessoriesSupCooldown")));
+            }
+            this.dealers = new ArrayList<>();
+            for (int i = 0; i < n_dealers; ++i) {
+                this.dealers.add(new Dealer<Car>(carStorage, Car.class, initValues.get("dealerCooldown")));
+            }
+
+            this.workers = (ThreadPoolExecutor) Executors.newFixedThreadPool(initValues.get("n_workers"));
+        } catch (NullPointerException ex) {
+            Factory.logger.error("Improper initialization value (not found in config file).");
+            throw new FactoryException("Improper initialization value (not found in config file).");
+        }  catch (Exception ex) {
+            Factory.logger.error("Unexpected error during factory initialization.");
+            throw new FactoryException("Unexpected error during factory initialization.");
         }
-        this.dealers = new ArrayList<>();
-        for(int i = 0; i < n_dealers; ++i) {
-            this.dealers.add(new Dealer<Car>(carStorage, Car.class, initValues.get("dealerCooldown")));
-        }
-
-        this.workers = (ThreadPoolExecutor) Executors.newFixedThreadPool(initValues.get("n_workers"));
 
         this.controller = new StorageController(this.workers, this.engineDetailStorage,
                 this.carcassDetailStorage, this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);

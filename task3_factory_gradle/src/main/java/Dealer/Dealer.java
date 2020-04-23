@@ -29,7 +29,6 @@ public class Dealer<T> extends Thread
             } catch (Exception ex) {
                 Thread.currentThread().interrupt(); // preserve interruption status
                 Factory.logger.error("Unexpected exception : stopping dealer thread.");
-                ex.printStackTrace();
                 break;
             }
         }
