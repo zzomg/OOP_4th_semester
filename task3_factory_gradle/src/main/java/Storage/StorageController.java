@@ -4,14 +4,16 @@ import Car.Car;
 import Details.AccessoriesDetail;
 import Details.CarcassDetail;
 import Details.EngineDetail;
-import Factory.Factory;
 import Task.Task;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-// observer
 public class StorageController implements Observer
 {
+    private static final Logger logger = LogManager.getLogger(StorageController.class.getName());
+
     private ThreadPoolExecutor executor;
     private Storage<EngineDetail> engineStorage;
     private Storage<CarcassDetail> carcassStorage;
@@ -38,8 +40,8 @@ public class StorageController implements Observer
 
     @Override
     public void update(long size, long capacity) {
-        Factory.logger.info("Checking car storage...");
-        Factory.logger.info(String.format("Car storage size: %d", size));
+        logger.info("Checking car storage...");
+        logger.info(String.format("Car storage size: %d", size));
 
         // try and fill storage up to 80% of capacity
         // also doesn't load executor over and over if there's already enough tasks in the queue
@@ -49,7 +51,7 @@ public class StorageController implements Observer
                 Task task = new Task(engineStorage, carcassStorage, accessoriesStorage, n_accessories, carStorage);
                 executor.execute(task);
             }
-            Factory.logger.info(String.format("Controller : Added %d tasks to workflow.",
+            logger.info(String.format("Controller : Added %d tasks to workflow.",
                     (long)(capacity * 0.8) - size));
         }
     }

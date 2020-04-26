@@ -5,6 +5,7 @@ import Dealer.Dealer;
 import Details.AccessoriesDetail;
 import Details.CarcassDetail;
 import Details.EngineDetail;
+import Exception.FactoryException;
 import Storage.Storage;
 import Storage.StorageController;
 import Supplier.Supplier;
@@ -12,16 +13,15 @@ import Task.Task;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import Exception.FactoryException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 public class Factory
 {
-    public static final Logger logger = LogManager.getLogger(Factory.class.getName());
+    private static final Logger logger = LogManager.getLogger(Factory.class.getName());
     private Map<String, Integer> initValues = new HashMap<>();
 
     private int n_accessoriesSuppliers;
@@ -90,10 +90,10 @@ public class Factory
 
             this.workers = (ThreadPoolExecutor) Executors.newFixedThreadPool(initValues.get("n_workers"));
         } catch (NullPointerException ex) {
-            Factory.logger.error("Improper initialization value (not found in config file).");
+            logger.error("Improper initialization value (not found in config file).");
             throw new FactoryException("Improper initialization value (not found in config file).");
         }  catch (Exception ex) {
-            Factory.logger.error("Unexpected error during factory initialization.");
+            logger.error("Unexpected error during factory initialization.");
             throw new FactoryException("Unexpected error during factory initialization.");
         }
 
@@ -101,7 +101,7 @@ public class Factory
                 this.carcassDetailStorage, this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);
     }
 
-    public void start() throws IOException {
+    public void start() {
         logger.info("Starting factory...");
         this.carStorage.addObserver(controller);
 
@@ -121,35 +121,32 @@ public class Factory
         Task task = new Task(this.engineDetailStorage, this.carcassDetailStorage,
                 this.accessoriesDetailStorage, this.n_accessoriesSuppliers, this.carStorage);
         this.workers.execute(task);
-
-        int stop;
-        while (true) {
-            stop = System.in.read();
-            if (stop == 'S' || stop == 's') {
-                this.stop();
-                break;
-            }
-        }
     }
 
-    private void stop()
-    {
+    public void stop() throws InterruptedException {
         logger.info("Stopping factory...");
         this.carStorage.removeObserver(controller);
 
         logger.info("Stopping workflow...");
         this.workers.shutdownNow();
+        this.workers.awaitTermination(5L, TimeUnit.SECONDS);
 
         logger.info("Stopping suppliers...");
         this.engineDetailSupplier.interrupt();
+        this.engineDetailSupplier.join();
+
         this.carcassDetailSupplier.interrupt();
+        this.carcassDetailSupplier.join();
+
         for(int i = 0; i < n_accessoriesSuppliers; ++i) {
             this.accessoriesDetailSuppliers.get(i).interrupt();
+            this.accessoriesDetailSuppliers.get(i).join();
         }
 
         logger.info("Stopping dealers...");
         for(int i = 0; i < n_dealers; ++i) {
             this.dealers.get(i).interrupt();
+            this.dealers.get(i).join();
         }
     }
 }

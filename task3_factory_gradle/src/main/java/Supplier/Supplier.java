@@ -2,9 +2,13 @@ package Supplier;
 
 import Factory.Factory;
 import Storage.Storage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Supplier<T> extends Thread
 {
+    private static final Logger logger = LogManager.getLogger(Supplier.class.getName());
+
     private long cooldown;
     private Storage<T> storage;
     private Class<T> item;
@@ -20,15 +24,15 @@ public class Supplier<T> extends Thread
         while (!isInterrupted()) {
             try {
                 storage.add(item.getDeclaredConstructor().newInstance());
-                Factory.logger.info(String.format("Supplier added new %s to storage.", item.getName()));
+                logger.info(String.format("Supplier added new %s to storage.", item.getName()));
                 sleep(cooldown);
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt(); // preserve interruption status
-                Factory.logger.warn("Supplier thread was interrupted.");
+                logger.warn("Supplier thread was interrupted.");
                 break;
             } catch (Exception ex) {
                 Thread.currentThread().interrupt(); // preserve interruption status
-                Factory.logger.error("Unexpected exception : stopping supplier thread.");
+                logger.error("Unexpected exception : stopping supplier thread.");
                 ex.printStackTrace();
                 break;
             }

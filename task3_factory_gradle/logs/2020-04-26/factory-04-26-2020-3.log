@@ -1,0 +1,101 @@
+2020-04-26 23:27:23,331 INFO Factory.Factory [main] Starting factory...
+2020-04-26 23:27:23,334 INFO Factory.Factory [main] Starting suppliers...
+2020-04-26 23:27:23,334 INFO Factory.Factory [main] Starting dealers...
+2020-04-26 23:27:23,335 INFO Factory.Factory [main] Starting workflow...
+2020-04-26 23:27:23,335 INFO Supplier.Supplier [Thread-1] Supplier added new Details.CarcassDetail to storage.
+2020-04-26 23:27:23,335 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:23,335 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:23,335 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:23,335 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:23,338 INFO Task.Task [pool-2-thread-1] Assembling a car...
+2020-04-26 23:27:23,338 INFO Task.Task [pool-2-thread-1] Car is assembled.
+2020-04-26 23:27:23,338 INFO Task.Task [pool-2-thread-1] Added new car to car storage.
+2020-04-26 23:27:23,338 INFO Storage.StorageController [Thread-5] Checking car storage...
+2020-04-26 23:27:23,339 INFO Storage.StorageController [Thread-5] Car storage size: 0
+2020-04-26 23:27:23,340 INFO Task.Task [pool-2-thread-2] Assembling a car...
+2020-04-26 23:27:23,340 INFO Task.Task [pool-2-thread-6] Assembling a car...
+2020-04-26 23:27:23,340 INFO Task.Task [pool-2-thread-3] Assembling a car...
+2020-04-26 23:27:23,341 INFO Task.Task [pool-2-thread-1] Assembling a car...
+2020-04-26 23:27:23,340 INFO Task.Task [pool-2-thread-4] Assembling a car...
+2020-04-26 23:27:23,340 INFO Task.Task [pool-2-thread-5] Assembling a car...
+2020-04-26 23:27:23,341 INFO Storage.StorageController [Thread-5] Controller : Added 8 tasks to workflow.
+2020-04-26 23:27:23,341 INFO Dealer.Dealer [Thread-5] Dealer got new Car.Car from storage.
+2020-04-26 23:27:23,836 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:23,836 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:23,836 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,337 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,337 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:24,337 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,337 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,836 INFO Task.Task [pool-2-thread-2] Car is assembled.
+2020-04-26 23:27:24,836 INFO Supplier.Supplier [Thread-1] Supplier added new Details.CarcassDetail to storage.
+2020-04-26 23:27:24,836 INFO Task.Task [pool-2-thread-2] Added new car to car storage.
+2020-04-26 23:27:24,836 INFO Task.Task [pool-2-thread-2] Assembling a car...
+2020-04-26 23:27:24,836 INFO Storage.StorageController [Thread-7] Checking car storage...
+2020-04-26 23:27:24,837 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,837 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,837 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:24,837 INFO Storage.StorageController [Thread-7] Car storage size: 0
+2020-04-26 23:27:24,837 INFO Storage.StorageController [Thread-7] Controller : Added 8 tasks to workflow.
+2020-04-26 23:27:24,838 INFO Dealer.Dealer [Thread-7] Dealer got new Car.Car from storage.
+2020-04-26 23:27:25,337 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:25,338 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:25,338 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:25,338 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:25,838 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:25,838 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:25,838 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,337 INFO Task.Task [pool-2-thread-3] Car is assembled.
+2020-04-26 23:27:26,337 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:26,337 INFO Supplier.Supplier [Thread-1] Supplier added new Details.CarcassDetail to storage.
+2020-04-26 23:27:26,337 INFO Task.Task [pool-2-thread-3] Added new car to car storage.
+2020-04-26 23:27:26,338 INFO Task.Task [pool-2-thread-3] Assembling a car...
+2020-04-26 23:27:26,337 INFO Storage.StorageController [Thread-6] Checking car storage...
+2020-04-26 23:27:26,338 INFO Storage.StorageController [Thread-6] Car storage size: 0
+2020-04-26 23:27:26,339 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,339 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,339 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,339 INFO Storage.StorageController [Thread-6] Controller : Added 8 tasks to workflow.
+2020-04-26 23:27:26,339 INFO Dealer.Dealer [Thread-6] Dealer got new Car.Car from storage.
+2020-04-26 23:27:26,839 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,839 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:26,839 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,337 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:27,340 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,340 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,341 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,837 INFO Task.Task [pool-2-thread-4] Car is assembled.
+2020-04-26 23:27:27,837 INFO Supplier.Supplier [Thread-1] Supplier added new Details.CarcassDetail to storage.
+2020-04-26 23:27:27,837 INFO Task.Task [pool-2-thread-4] Added new car to car storage.
+2020-04-26 23:27:27,837 INFO Task.Task [pool-2-thread-4] Assembling a car...
+2020-04-26 23:27:27,841 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,841 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:27,842 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,338 INFO Supplier.Supplier [Thread-0] Supplier added new Details.EngineDetail to storage.
+2020-04-26 23:27:28,342 INFO Storage.StorageController [Thread-5] Checking car storage...
+2020-04-26 23:27:28,342 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,342 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,342 INFO Storage.StorageController [Thread-5] Car storage size: 0
+2020-04-26 23:27:28,342 INFO Dealer.Dealer [Thread-5] Dealer got new Car.Car from storage.
+2020-04-26 23:27:28,343 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,842 INFO Supplier.Supplier [Thread-4] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,842 INFO Supplier.Supplier [Thread-2] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:28,843 INFO Supplier.Supplier [Thread-3] Supplier added new Details.AccessoriesDetail to storage.
+2020-04-26 23:27:29,288 INFO Factory.Factory [main] Stopping factory...
+2020-04-26 23:27:29,288 INFO Factory.Factory [main] Stopping workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-3] Interrupting workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-6] Interrupting workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-4] Interrupting workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-2] Interrupting workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-1] Interrupting workflow...
+2020-04-26 23:27:29,289 WARN Task.Task [pool-2-thread-5] Interrupting workflow...
+2020-04-26 23:27:29,290 INFO Factory.Factory [main] Stopping suppliers...
+2020-04-26 23:27:29,290 WARN Supplier.Supplier [Thread-0] Supplier thread was interrupted.
+2020-04-26 23:27:29,290 WARN Supplier.Supplier [Thread-1] Supplier thread was interrupted.
+2020-04-26 23:27:29,291 WARN Supplier.Supplier [Thread-2] Supplier thread was interrupted.
+2020-04-26 23:27:29,291 WARN Supplier.Supplier [Thread-3] Supplier thread was interrupted.
+2020-04-26 23:27:29,291 WARN Supplier.Supplier [Thread-4] Supplier thread was interrupted.
+2020-04-26 23:27:29,292 INFO Factory.Factory [main] Stopping dealers...
+2020-04-26 23:27:29,292 WARN Dealer.Dealer [Thread-5] Dealer thread was interrupted.
+2020-04-26 23:27:29,292 WARN Dealer.Dealer [Thread-6] Dealer thread was interrupted.
+2020-04-26 23:27:29,292 WARN Dealer.Dealer [Thread-7] Dealer thread was interrupted.
