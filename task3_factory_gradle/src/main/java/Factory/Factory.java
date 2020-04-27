@@ -136,13 +136,11 @@ public class Factory
 
         for(int i = 0; i < n_accessoriesSuppliers; ++i) {
             this.accessoriesDetailSuppliers.get(i).interrupt();
-            this.accessoriesDetailSuppliers.get(i).join();
         }
 
         logger.info("Stopping dealers...");
         for(int i = 0; i < n_dealers; ++i) {
             this.dealers.get(i).interrupt();
-            this.dealers.get(i).join();
         }
 
         this.workers.awaitTermination(5L, TimeUnit.SECONDS);
