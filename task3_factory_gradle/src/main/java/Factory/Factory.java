@@ -129,14 +129,10 @@ public class Factory
 
         logger.info("Stopping workflow...");
         this.workers.shutdownNow();
-        this.workers.awaitTermination(5L, TimeUnit.SECONDS);
 
         logger.info("Stopping suppliers...");
         this.engineDetailSupplier.interrupt();
-        this.engineDetailSupplier.join();
-
         this.carcassDetailSupplier.interrupt();
-        this.carcassDetailSupplier.join();
 
         for(int i = 0; i < n_accessoriesSuppliers; ++i) {
             this.accessoriesDetailSuppliers.get(i).interrupt();
@@ -146,6 +142,17 @@ public class Factory
         logger.info("Stopping dealers...");
         for(int i = 0; i < n_dealers; ++i) {
             this.dealers.get(i).interrupt();
+            this.dealers.get(i).join();
+        }
+
+        this.workers.awaitTermination(5L, TimeUnit.SECONDS);
+
+        this.engineDetailSupplier.join();
+        this.carcassDetailSupplier.join();
+        for(int i = 0; i < n_accessoriesSuppliers; ++i) {
+            this.accessoriesDetailSuppliers.get(i).join();
+        }
+        for(int i = 0; i < n_dealers; ++i) {
             this.dealers.get(i).join();
         }
     }
