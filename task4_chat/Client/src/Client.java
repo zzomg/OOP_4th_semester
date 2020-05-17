@@ -13,9 +13,7 @@ public class Client implements Runnable
     private final SocketChannel client;
     private ByteBuffer buffer;
 
-    private volatile boolean running;
-
-    Thread executionThread;
+    private static final String exit_cmd = "/exit";
 
     public Client(InetSocketAddress address) throws IOException{
         this.client = SocketChannel.open();
@@ -28,20 +26,18 @@ public class Client implements Runnable
         BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
         String msg = "";
         String response = "";
-        while (this.running) {
+        while (true) {
             System.out.println("Enter message:");
 
             try {
                 msg = consoleReader.readLine();
             } catch (IOException e) {
                 System.out.println("ERROR : Failed reading from console");
-                this.stop();
                 break;
             }
             try {
                 response = this.sendMessage(msg);
             } catch (IOException e) {
-                this.stop();
                 break;
             }
             System.out.println(String.format("Got response from server: %s", response));
@@ -49,27 +45,9 @@ public class Client implements Runnable
         cleanUp();
     }
 
-    public synchronized void start() {
-        System.out.println("Starting client...");
-        this.executionThread = new Thread(this);
-        this.running = true;
-        this.executionThread.start();
-    }
-
-    public void stop() {
-        System.out.println("Stopping client...");
-        this.running = false;
-    }
-
     public void cleanUp() {
         close(this.client);
         this.buffer = null;
-        this.executionThread.interrupt();
-//        try {
-//            this.executionThread.join();
-//        } catch (InterruptedException ex) {
-//            ex.printStackTrace();
-//        }
     }
 
     public String sendMessage(String msg) throws IOException {
@@ -80,16 +58,19 @@ public class Client implements Runnable
             this.client.write(this.buffer);
         } catch (IOException e) {
             System.out.println("ERROR : Cannot write message, server is down.");
-            throw new IOException();
+            throw e;
         }
         this.buffer.clear();
         try {
             client.read(buffer);
         } catch (IOException e) {
             System.out.println("ERROR : Cannot read answer, server is down.");
-            throw new IOException();
+            throw e;
         }
         response = new String(buffer.array()).trim();
+        if(response.equals(exit_cmd)) {
+            throw new IOException();
+        }
         buffer.clear();
 
         return response;
