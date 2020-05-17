@@ -14,17 +14,12 @@ public class Server implements Runnable
     private static final String exit_cmd = "/exit";
 
     private final int BUF_SIZE = 256;
-    private volatile boolean running;
 
     private final Selector selector;
     private final ServerSocketChannel serverSocket;
-    private final InetSocketAddress address;
     private final ByteBuffer buffer;
 
-    Thread executionThread;
-
     public Server(InetSocketAddress address) throws IOException {
-        this.address = address;
         this.buffer = ByteBuffer.allocate(BUF_SIZE);
         this.selector = Selector.open();
         this.serverSocket = serverSocket(address);
@@ -40,8 +35,43 @@ public class Server implements Runnable
 
     @Override
     public void run() {
-        while (this.running) {
-            runMainLoop();
+        while (true) {
+            try {
+                this.selector.select();
+            } catch (IOException ex) {
+                System.out.println("ERROR : Server selector cannot select keys");
+                break;
+            }
+
+            Set<SelectionKey> selectedKeys = this.selector.selectedKeys();
+            Iterator<SelectionKey> iter = selectedKeys.iterator();
+
+            while (iter.hasNext()) {
+
+                SelectionKey key = iter.next();
+
+                if (key.isAcceptable()) {
+                    System.out.println("Registering new client...");
+                    try {
+                        register(selector, serverSocket);
+                    } catch (IOException e) {
+                        System.out.println("WARNING : Cannot register new client");
+                        close(key.channel());
+                        continue;
+                    }
+                }
+
+                if (key.isReadable()) {
+                    System.out.println("Reading from client...");
+                    try {
+                        readFromClient(buffer, key);
+                    } catch (IOException ex1) {
+                        System.out.println("INFO : Client disconnected.");
+                        close(key.channel());
+                    }
+                }
+                iter.remove();
+            }
         }
         cleanUp();
     }
@@ -51,52 +81,6 @@ public class Server implements Runnable
             close(key.channel());
         }
         close(this.selector);
-        this.executionThread.interrupt();
-//        try {
-//            this.executionThread.join();
-//        } catch (InterruptedException ex) {
-//            ex.printStackTrace();
-//        }
-    }
-
-    private void runMainLoop() {
-        try {
-            this.selector.select();
-        } catch (IOException ex) {
-            System.out.println("ERROR : Server selector cannot select keys");
-            this.stop();
-            return;
-        }
-
-        Set<SelectionKey> selectedKeys = this.selector.selectedKeys();
-        Iterator<SelectionKey> iter = selectedKeys.iterator();
-
-        while (iter.hasNext()) {
-
-            SelectionKey key = iter.next();
-
-            if (key.isAcceptable()) {
-                System.out.println("Registering new client...");
-                try {
-                    register(selector, serverSocket);
-                } catch (IOException e) {
-                    System.out.println("WARNING : Cannot register new client");
-                    close(key.channel());
-                    continue;
-                }
-            }
-
-            if (key.isReadable()) {
-                System.out.println("Reading from client...");
-                try {
-                    readFromClient(buffer, key);
-                } catch (IOException ex1) {
-                    System.out.println("INFO : Client disconnected.");
-                    close(key.channel());
-                }
-            }
-            iter.remove();
-        }
     }
 
     private static void readFromClient(ByteBuffer buffer, SelectionKey key)
@@ -106,7 +90,7 @@ public class Server implements Runnable
         client.read(buffer);
         if (new String(buffer.array()).trim().equals(exit_cmd)) {
             client.close();
-            System.out.println("Not accepting client messages anymore");
+            System.out.println("Disconnecting client...");
         }
 
         buffer.flip();
@@ -121,18 +105,6 @@ public class Server implements Runnable
         SocketChannel client = serverSocket.accept();
         client.configureBlocking(false);
         client.register(selector, SelectionKey.OP_READ);
-    }
-
-    public synchronized void start() {
-        System.out.println("Starting server...");
-        this.executionThread = new Thread(this);
-        this.running = true;
-        this.executionThread.start();
-    }
-
-    public void stop() {
-        System.out.println("Stopping server...");
-        running = false;
     }
 
     private void close(Closeable... closeables) {
