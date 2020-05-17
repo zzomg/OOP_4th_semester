@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
-import java.io.Closeable;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -12,10 +9,11 @@ public class Client implements Runnable
 
     private final SocketChannel client;
     private ByteBuffer buffer;
-
+    private final String name;
     private static final String exit_cmd = "/exit";
 
-    public Client(InetSocketAddress address) throws IOException{
+    public Client(String name, InetSocketAddress address) throws IOException{
+        this.name = name;
         this.client = SocketChannel.open();
         this.client.connect(address);
         this.buffer = ByteBuffer.allocate(BUF_SIZE);
@@ -23,6 +21,11 @@ public class Client implements Runnable
 
     @Override
     public void run() {
+        try {
+            sendMessage(this.name, MessageType.INFO_TYPE);
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         BufferedReader consoleReader = new BufferedReader(new InputStreamReader(System.in));
         String msg = "";
         String response = "";
@@ -36,8 +39,12 @@ public class Client implements Runnable
                 break;
             }
             try {
-                response = this.sendMessage(msg);
+                response = this.sendMessage(msg, MessageType.TEXT_TYPE);
             } catch (IOException e) {
+                System.out.println("ERROR : Failed sending message");
+                break;
+            } catch (ClassNotFoundException e) {
+                System.out.println("ERROR : Class not found");
                 break;
             }
             System.out.println(String.format("Got response from server: %s", response));
@@ -50,9 +57,9 @@ public class Client implements Runnable
         this.buffer = null;
     }
 
-    public String sendMessage(String msg) throws IOException {
-        this.buffer = ByteBuffer.wrap(msg.getBytes());
-        String response;
+    public String sendMessage(String msg, MessageType type) throws IOException, ClassNotFoundException {
+        Message message = new Message(type, msg);
+        this.buffer = ByteBuffer.wrap(Message.convertToBytes(message));
 
         try {
             this.client.write(this.buffer);
@@ -62,18 +69,19 @@ public class Client implements Runnable
         }
         this.buffer.clear();
         try {
-            client.read(buffer);
+            client.read(this.buffer);
         } catch (IOException e) {
             System.out.println("ERROR : Cannot read answer, server is down.");
             throw e;
         }
-        response = new String(buffer.array()).trim();
-        if(response.equals(exit_cmd)) {
+        Message resp = (Message) Message.convertFromBytes (this.buffer.array());
+        String resp_text = resp.getMessage();
+        if(resp_text.equals(exit_cmd)) {
             throw new IOException();
         }
         buffer.clear();
 
-        return response;
+        return resp_text;
     }
 
     private void close(Closeable... closeables) {
