@@ -74,7 +74,7 @@ public class Client implements Runnable
             System.out.println("ERROR : Cannot read answer, server is down.");
             throw e;
         }
-        Message resp = (Message) Message.convertFromBytes (this.buffer.array());
+        Message resp = (Message) Message.convertFromBytes (this.buffer.array()); // <-- Вот в этой строчке в методе convertFromBytes кидается эксепшн
         String resp_text = resp.getMessage();
         if(resp_text.equals(exit_cmd)) {
             throw new IOException();
