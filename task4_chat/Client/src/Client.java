@@ -69,7 +69,7 @@ public class Client implements Runnable
         }
         this.buffer.clear();
         try {
-            client.read(this.buffer);
+            this.client.read(this.buffer);
         } catch (IOException e) {
             System.out.println("ERROR : Cannot read answer, server is down.");
             throw e;

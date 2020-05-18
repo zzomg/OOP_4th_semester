@@ -129,10 +129,12 @@ public class Server implements Runnable
                 client.write(buffer);
                 buffer.clear();
             } else if(msg_text.equals(list_clients_cmd)) {
-                StringBuilder out = new StringBuilder();
-                for(var c : clients) {
-                    out.append(c.getValue());
-                    System.out.println(out);
+                /////////////////// Если оставить только эту строчку - все работает
+                StringBuilder out = new StringBuilder(clients.get(0).getValue());
+                /////////////////// Если с этим циклом - при чтении сообщения на клиенте в методе convertFromBytes
+                // возникает EOFException
+                for(int i = 0; i < clients.size(); ++i) {
+                    out.append(clients.get(0).getValue());
                 }
                 Message client_list = new Message(MessageType.TEXT_TYPE, out.toString());
                 buffer.flip();
