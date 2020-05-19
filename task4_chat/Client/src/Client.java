@@ -5,7 +5,6 @@ import java.nio.channels.SocketChannel;
 
 public class Client implements Runnable
 {
-    private final int intSize = 4;
     private static final String exit_cmd = "/exit";
 
     private final SocketChannel client;
@@ -36,7 +35,11 @@ public class Client implements Runnable
                 break;
             }
             try {
-                this.sendMessage(msg, MessageType.TEXT_TYPE);
+                String response = this.sendMessage(msg, MessageType.TEXT_TYPE);
+                if(response.equals(exit_cmd)) {
+                    System.out.println("Closing client...");
+                    break;
+                }
             } catch (IOException e) {
                 System.out.println("ERROR : Failed sending message");
                 break;
@@ -52,8 +55,10 @@ public class Client implements Runnable
         close(this.client);
     }
 
-    public void sendMessage(String msg, MessageType type) throws IOException, ClassNotFoundException
+    public String sendMessage(String msg, MessageType type) throws IOException, ClassNotFoundException
     {
+        int intSize = 4;
+
         Message message = new Message(type, msg);
 
         // смотрим сколько байт в отправляемом сообщении
@@ -61,6 +66,7 @@ public class Client implements Runnable
         int bufCapacity = buffer.capacity();
 
         // отправляем на сервер это количество байт, чтобы он знал, сколько нужно будет считать
+
         ByteBuffer capacityBuffer = ByteBuffer.allocate(intSize);
         capacityBuffer.putInt(bufCapacity);
         capacityBuffer.flip();
@@ -101,16 +107,21 @@ public class Client implements Runnable
             throw e;
         }
         responseBuffer.flip();
+
         Message resp = (Message) Message.convertFromBytes (responseBuffer.array());
         String resp_text = resp.getMessage();
         System.out.println(resp_text);
-        if(resp_text.equals(exit_cmd)) {
-            throw new IOException();
-        }
+
         buffer.clear();
         capacityBuffer.clear();
         responseCapacityBuffer.clear();
         responseBuffer.clear();
+
+        if(resp_text.equals(exit_cmd)) {
+            return exit_cmd;
+        }
+
+        return resp_text;
     }
 
     private void close(Closeable... closeables) {
