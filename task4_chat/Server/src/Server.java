@@ -15,17 +15,14 @@ public class Server implements Runnable
     private static final String exit_cmd = "/exit";
     private static final String list_clients_cmd = "/who";
 
-//    private final int BUF_SIZE = 256;
     private final int intSize = 4;
 
     private final Selector selector;
     private final ServerSocketChannel serverSocket;
-//    private final ByteBuffer buffer;
 
     private List< Pair<SelectionKey, String> > clients;
 
     public Server(InetSocketAddress address) throws IOException {
-//        this.buffer = ByteBuffer.allocate(BUF_SIZE);
         this.selector = Selector.open();
         this.serverSocket = serverSocket(address);
         this.clients = new ArrayList<>();
