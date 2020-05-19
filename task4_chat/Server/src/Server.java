@@ -15,16 +15,17 @@ public class Server implements Runnable
     private static final String exit_cmd = "/exit";
     private static final String list_clients_cmd = "/who";
 
-    private final int BUF_SIZE = 256;
+//    private final int BUF_SIZE = 256;
+    private final int intSize = 4;
 
     private final Selector selector;
     private final ServerSocketChannel serverSocket;
-    private final ByteBuffer buffer;
+//    private final ByteBuffer buffer;
 
     private List< Pair<SelectionKey, String> > clients;
 
     public Server(InetSocketAddress address) throws IOException {
-        this.buffer = ByteBuffer.allocate(BUF_SIZE);
+//        this.buffer = ByteBuffer.allocate(BUF_SIZE);
         this.selector = Selector.open();
         this.serverSocket = serverSocket(address);
         this.clients = new ArrayList<>();
@@ -54,14 +55,8 @@ public class Server implements Runnable
             while (iter.hasNext()) {
 
                 SelectionKey key = iter.next();
-//                System.out.println("Clients: " + clients);
-//                System.out.println("Selector keys 1: ");
-//                for (var k : selector.keys()) {
-//                    System.out.println(k);
-//                }
 
                 if (key.isAcceptable()) {
-//                    System.out.println("Key is" + key.toString());
                     System.out.println("Registering new client...");
                     try {
                         register(selector, serverSocket);
@@ -74,12 +69,11 @@ public class Server implements Runnable
                 }
 
                 if (key.isValid() && key.isReadable()) {
-//                    System.out.println("Key is " + key.toString());
                     System.out.println("Reading from client...");
                     try {
-                        readFromClient(buffer, key);
+                        readFromClient(key);
                     } catch (IOException ex1) {
-                        System.out.println("INFO : Client disconnected.");
+                        System.out.println("INFO : Client unexpectedly disconnected.");
                         close(key.channel());
                         clients.removeIf(client -> client.getKey() == key);
                     } catch (ClassNotFoundException ex1) {
@@ -89,11 +83,6 @@ public class Server implements Runnable
                     }
                 }
                 iter.remove();
-
-//                System.out.println("Selector keys 2: ");
-//                for (var k : selector.keys()) {
-//                    System.out.println(k);
-//                }
             }
         }
         cleanUp();
@@ -106,47 +95,116 @@ public class Server implements Runnable
         close(this.selector);
     }
 
-    private void readFromClient(ByteBuffer buffer, SelectionKey key)
-            throws IOException, ClassNotFoundException {
+    private void readFromClient(SelectionKey key)
+            throws IOException, ClassNotFoundException
+    {
         System.out.println("Getting message from client...");
+
         SocketChannel client = (SocketChannel) key.channel();
-        client.read(buffer);
+
+        // получаем от клиента сколько байт займет сообщение, которое он собирается отправить
+        ByteBuffer msgCapacityBuffer = ByteBuffer.allocate(intSize);
+        client.read(msgCapacityBuffer);
+        msgCapacityBuffer.flip();
+        int msgBufCapacity = msgCapacityBuffer.getInt();
+        System.out.println(String.format("Will get %d bytes in the next message from client", msgBufCapacity));
+
+        // создаем буфер такого размера для получения сообщения
+        System.out.println("Creating new buffer for this message...");
+        ByteBuffer buffer = ByteBuffer.allocate(msgBufCapacity);
+
+        try {
+            // пока не получим все нужные байты, читаем от клиента
+            int gotBytes = client.read(buffer);
+            System.out.println(String.format("Got %d bytes from client", gotBytes));
+            while (gotBytes < msgBufCapacity) {
+                gotBytes += client.read(buffer);
+                System.out.println(String.format("Got %d bytes from client", gotBytes));
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR : Cannot read message from client, some problems occurred.");
+            throw e;
+        }
+
+        buffer.flip();
+        System.out.println("Processing message...");
         Message msg = (Message) Message.convertFromBytes (buffer.array());
         MessageType msg_type = msg.getType();
         String msg_text = msg.getMessage();
-        if (msg_type == MessageType.INFO_TYPE) {
-            System.out.println(String.format("New user: %s", msg_text));
+
+        if (msg_type == MessageType.INFO_TYPE)
+        {
             clients.add(new Pair<>(key, msg_text));
-            buffer.flip();
-            client.write(buffer);
-            buffer.clear();
-        }
-        if (msg_type == MessageType.TEXT_TYPE) {
-            if (msg_text.equals(exit_cmd)) {
-                client.close();
-                System.out.println("Disconnecting client...");
-                buffer.flip();
-                client.write(buffer);
-                buffer.clear();
-            } else if(msg_text.equals(list_clients_cmd)) {
-                /////////////////// Если оставить только эту строчку - все работает
-                StringBuilder out = new StringBuilder(clients.get(0).getValue());
-                /////////////////// Если с этим циклом - при чтении сообщения на клиенте в методе convertFromBytes
-                // возникает EOFException
-                for(int i = 0; i < clients.size(); ++i) {
-                    out.append(clients.get(0).getValue());
-                }
-                Message client_list = new Message(MessageType.TEXT_TYPE, out.toString());
-                buffer.flip();
-                client.write(ByteBuffer.wrap(Message.convertToBytes(client_list)));
-                buffer.clear();
-            } else {
-                buffer.flip();
-                client.write(buffer);
-                buffer.clear();
-            }
+            System.out.println("Forming response for a client...");
+            String out = "New user registered successfully: " + msg_text;
+            Message registerInfo = new Message(MessageType.INFO_TYPE, out);
+
+            respondToClient(registerInfo, client);
         }
 
+        if (msg_type == MessageType.TEXT_TYPE)
+        {
+            if (msg_text.equals(exit_cmd))
+            {
+                System.out.println("Forming response for a client...");
+                Message exitResponse = new Message(MessageType.TEXT_TYPE, exit_cmd);
+
+                respondToClient(exitResponse, client);
+
+                System.out.println("Disconnecting client...");
+                client.close();
+                close(key.channel());
+                clients.removeIf(c -> c.getKey() == key);
+            }
+            else if(msg_text.equals(list_clients_cmd)) {
+                System.out.println("Forming response for a client...");
+                StringBuilder out = new StringBuilder("Clients list:\n");
+                for(int i = 0; i < clients.size(); ++i) {
+                    out.append(clients.get(i).getValue());
+                    if (i != clients.size() - 1) {
+                        out.append("\n");
+                    }
+                }
+                Message client_list = new Message(MessageType.TEXT_TYPE, out.toString());
+
+                respondToClient(client_list, client);
+            }
+            else {
+                System.out.println("Forming response for a client...");
+                Message echoResponse = new Message(MessageType.TEXT_TYPE, msg_text);
+
+                respondToClient(echoResponse, client);
+            }
+        }
+        msgCapacityBuffer.clear();
+        buffer.clear();
+    }
+
+    private void respondToClient(Message respond, SocketChannel client) throws IOException
+    {
+        // формируем буфер для отправки обратно клиенту
+        ByteBuffer responseBuffer = ByteBuffer.wrap(Message.convertToBytes(respond));
+        int responseCapacity = responseBuffer.capacity();
+
+        // сначала отправляем клиенту информацию о том, сколько байт поступит в ответе
+        ByteBuffer responseCapacityBuffer = ByteBuffer.allocate(intSize);
+        responseCapacityBuffer.putInt(responseCapacity);
+        responseCapacityBuffer.flip();
+        System.out.println(String.format("Client will get %d bytes in the response", responseCapacity));
+        client.write(responseCapacityBuffer);
+
+        try {
+            // пока в буфере что-то остается, отправляем эти данные клиенту
+            System.out.println("Sending response itself to client...");
+            while (responseBuffer.hasRemaining()) {
+                client.write(responseBuffer);
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR : Cannot send register info to client, some problems occurred.");
+            throw e;
+        }
+        responseBuffer.clear();
+        responseCapacityBuffer.clear();
     }
 
     private void register(Selector selector,
