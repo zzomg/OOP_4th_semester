@@ -60,6 +60,7 @@ public class Server implements Runnable
                     } catch (IOException e) {
                         System.out.println("WARNING : Cannot register new client");
                         close(key.channel());
+                        clients.removeIf(client -> client.getKey() == key);
                         continue;
                     }
 
