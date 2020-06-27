@@ -9,4 +9,6 @@
 1. Игра должна поддерживать таблицу рекордов.
 2. Пользователю должны быть доступны команды: Exit, About, New Game, High Scores.
 
-Credits: used this project as base: https://github.com/saacsos/java-tetris-mvc
+https://docs.google.com/viewer?a=v&pid=sites&srcid=ZGVmYXVsdGRvbWFpbnxuZ3Vvb3B8Z3g6NjEzMjc5Y2FkNzNiMzIyNA
+
+Credits: used this project as base https://github.com/saacsos/java-tetris-mvc
